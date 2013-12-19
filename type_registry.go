@@ -65,8 +65,6 @@ func (r *TypeRegistry) NewChild() *TypeRegistry {
 
 // Returns the value associated with the given type.
 //
-//
-//
 // If this registry does not contain a value of that type, its ancestors will
 // be checked.
 func (r *TypeRegistry) get(reflectedType reflect.Type) reflect.Value {

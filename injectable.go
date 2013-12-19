@@ -6,7 +6,7 @@ import (
 )
 
 // An Injectable wraps a function so that it can be called with type registries.
-type Injectable func(registry *TypeRegistry)
+type Injectable func(registry *TypeRegistry) []reflect.Value
 
 // Prepares a function for injection.
 func PrepareFunc(function interface{}) Injectable {
@@ -19,6 +19,10 @@ func PrepareFunc(function interface{}) Injectable {
 	}
 
 	numIn := signature.NumIn()
+	if numIn == 0 {
+		panic("PrepareFunc() requires a function with one or more argument.")
+	}
+
 	argTypes := make([]reflect.Type, numIn)
 	for i := 0; i < numIn; i++ {
 		argTypes[i] = signature.In(i)
@@ -26,7 +30,7 @@ func PrepareFunc(function interface{}) Injectable {
 
 	funcValue := reflect.ValueOf(function)
 
-	return func(registry *TypeRegistry) {
+	return func(registry *TypeRegistry) []reflect.Value {
 		args := make([]reflect.Value, numIn)
 		for i := 0; i < numIn; i++ {
 			value := registry.get(argTypes[i])
@@ -36,7 +40,7 @@ func PrepareFunc(function interface{}) Injectable {
 			args[i] = value
 		}
 
-		funcValue.Call(args)
+		return funcValue.Call(args)
 	}
 }
 
@@ -44,8 +48,13 @@ func PrepareFunc(function interface{}) Injectable {
 // the type signature of the function.
 //
 // Any return values are returned as an array of interfaces.
-func (i Injectable) Call(registry *TypeRegistry) ([]interface{}, error) {
-	i(registry)
+func (i Injectable) Call(registry *TypeRegistry) []interface{} {
+	reflectedResults := i(registry)
 
-	return nil, nil
+	results := make([]interface{}, len(reflectedResults))
+	for i := range reflectedResults {
+		results[i] = reflectedResults[i].Interface()
+	}
+
+	return results
 }
