@@ -9,6 +9,8 @@ import (
 type Injectable func(registry *TypeRegistry) []reflect.Value
 
 // Prepares a function for injection.
+//
+// Once prepared, the function can be Call()'d any number of times.
 func PrepareFunc(function interface{}) Injectable {
 	signature := reflect.TypeOf(function)
 	if signature.Kind() != reflect.Func {
@@ -44,10 +46,10 @@ func PrepareFunc(function interface{}) Injectable {
 	}
 }
 
-// Invokes the underlying function, passing the values in registry that match
-// the type signature of the function.
+// Invokes the underlying function, injecting values present in registry that
+// match the function's argument types.
 //
-// Any return values are returned as an array of interfaces.
+// Any return values are returned.
 func (i Injectable) Call(registry *TypeRegistry) []interface{} {
 	reflectedResults := i(registry)
 
