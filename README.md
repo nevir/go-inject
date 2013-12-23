@@ -35,10 +35,10 @@ registry.Register((*http.Request)(nil), request)
 registry.Register((*Path)(nil), request.URL.Path)
 ```
 
-To perform the injection, simply `Call` the prepared function:
+To perform the injection, simply call the prepared function with a registry:
 
 ```go
-articleRoute.Call(registry)
+articleRoute(registry)
 ```
 
 
