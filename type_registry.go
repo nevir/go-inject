@@ -17,7 +17,7 @@ func NewTypeRegistry() *TypeRegistry {
 	registry := &TypeRegistry{
 		mapping: make(map[reflect.Type]reflect.Value),
 	}
-	registry.Register((*TypeRegistry)(nil), registry)
+	registry.Register(registry, (*TypeRegistry)(nil))
 
 	return registry
 }
@@ -28,20 +28,29 @@ func NewTypeRegistry() *TypeRegistry {
 // desired interface, while value can be any object that satisfies that
 // interface. Typical call pattern:
 //
-//   registry.Register((*SomeType)(nil), value)
+//   registry.Register(value, (*SomeType)(nil))
 //
-// The registered type preserves whether or not the value is a pointer. If value
-// is a pointer, it will only be injected as a pointer; and vice versa.
+// For simplicity, and because we are forced to handle type pointers, Register
+// infers the type that value will be exposed as based on the types of typePtr
+// value:
+//
+// * If typePtr points to an interface, value will be directly exposed as that
+//   interface.
+//
+// * If value is a pointer, it will be exposed as typePtr's given type.
+//
+// * If value is a value, it will be exposed as a value of the type that typePtr
+//   points to.
 //
 // If a value is already registered for the type, it will be overridden.
-func (r *TypeRegistry) Register(typePtr, value interface{}) {
+func (r *TypeRegistry) Register(value, typePtr interface{}) {
+	reflectedValue := reflect.ValueOf(value)
 	reflectedType := reflect.TypeOf(typePtr)
 	if reflectedType.Kind() != reflect.Ptr {
-		panic(fmt.Sprintf("typePtr requires an interface pointer. Did you mean to call Register((*%T)(nil), ...)?", typePtr))
+		panic(fmt.Sprintf("Register() requires a type pointer. Did you mean to call Register(..., (*%T)(nil))?", typePtr))
 	}
 
-	reflectedValue := reflect.ValueOf(value)
-	if reflectedValue.Type().Kind() != reflect.Ptr {
+	if reflectedType.Elem().Kind() == reflect.Interface || reflectedValue.Kind() != reflect.Ptr {
 		reflectedType = reflectedType.Elem()
 	}
 

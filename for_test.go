@@ -6,9 +6,16 @@ import (
 	"testing"
 )
 
-type SomeInterface interface{}
+type SomeInterface interface{
+	GetStuff() string
+}
+
 type SomeType struct {
 	stuff string
+}
+
+func (t SomeType) GetStuff() string {
+	return t.stuff
 }
 
 // The easiest way to express our types is just to expose them via a function

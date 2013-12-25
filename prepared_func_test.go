@@ -7,16 +7,16 @@ import (
 
 func TestFuncCalled(t *testing.T) {
 	registry := NewTypeRegistry()
-	registry.Register((*SomeInterface)(nil), "abcd")
+	registry.Register(SomeType{"bar"}, (*SomeInterface)(nil))
 
 	var value SomeInterface
 	PrepareFunc(func(arg SomeInterface) { value = arg })(registry)
-	assert.Equal(t, "abcd", value)
+	assert.Equal(t, SomeType{"bar"}, value)
 }
 
 func TestValueArg(t *testing.T) {
 	registry := NewTypeRegistry()
-	registry.Register((*string)(nil), "foo")
+	registry.Register("foo", (*string)(nil))
 
 	PrepareFunc(func(arg string) {
 		assert.Equal(t, "foo", arg)
@@ -29,7 +29,7 @@ func TestLateBoundValue(t *testing.T) {
 	})
 
 	registry := NewTypeRegistry()
-	registry.Register((*string)(nil), "bar")
+	registry.Register("bar", (*string)(nil))
 	prepared(registry)
 }
 
@@ -38,20 +38,20 @@ func TestRedefinedValue(t *testing.T) {
 	registry := NewTypeRegistry()
 	prepared := PrepareFunc(func(arg string) { value = arg })
 
-	registry.Register((*string)(nil), "foo")
+	registry.Register("foo", (*string)(nil))
 	prepared(registry)
 	assert.Equal(t, "foo", value)
 
-	registry.Register((*string)(nil), "bar")
+	registry.Register("bar", (*string)(nil))
 	prepared(registry)
 	assert.Equal(t, "bar", value)
 }
 
 func TestMultipleArgs(t *testing.T) {
 	registry := NewTypeRegistry()
-	registry.Register((*int)(nil), 1234)
-	registry.Register((*string)(nil), "asdf")
-	registry.Register((*SomeType)(nil), &SomeType{"foo"})
+	registry.Register(1234, (*int)(nil))
+	registry.Register("asdf", (*string)(nil))
+	registry.Register(&SomeType{"foo"}, (*SomeType)(nil))
 
 	PrepareFunc(func(str string, num int, some *SomeType) {
 		assert.Equal(t, "asdf", str)
@@ -62,7 +62,7 @@ func TestMultipleArgs(t *testing.T) {
 
 func TestSingleReturnValue(t *testing.T) {
 	registry := NewTypeRegistry()
-	registry.Register((*int)(nil), 9000)
+	registry.Register(9000, (*int)(nil))
 
 	result := PrepareFunc(func(val int) int { return val + 1 })(registry)
 	assert.Equal(t, []interface{}{9001}, result)
@@ -70,7 +70,7 @@ func TestSingleReturnValue(t *testing.T) {
 
 func TestMultipleReturnValues(t *testing.T) {
 	registry := NewTypeRegistry()
-	registry.Register((*int)(nil), 9000)
+	registry.Register(9000, (*int)(nil))
 
 	result := PrepareFunc(func(val int) (int, string) { return 1234, "hi" })(registry)
 	assert.Equal(t, []interface{}{1234, "hi"}, result)
