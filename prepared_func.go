@@ -34,18 +34,18 @@ func PrepareFunc(function interface{}) PreparedFunc {
 
 	return func(registry *TypeRegistry) []interface{} {
 		args := make([]reflect.Value, numIn)
-		for i := 0; i < numIn; i++ {
-			value := registry.get(argTypes[i])
+		for i, argType := range argTypes {
+			value := registry.get(argType)
 			if !value.IsValid() {
-				panic(fmt.Sprintf("A value for %v is not registered in the TypeRegistry.", argTypes[i]))
+				panic(fmt.Sprintf("A value for %v is not registered in the TypeRegistry.", argType))
 			}
 			args[i] = value
 		}
 
 		reflectedResults := funcValue.Call(args)
 		results := make([]interface{}, len(reflectedResults))
-		for i := range reflectedResults {
-			results[i] = reflectedResults[i].Interface()
+		for i, reflectedResult := range reflectedResults {
+			results[i] = reflectedResult.Interface()
 		}
 
 		return results
