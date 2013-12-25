@@ -25,10 +25,6 @@ func PrepareFunc(function interface{}) PreparedFunc {
 	}
 
 	numIn := signature.NumIn()
-	if numIn == 0 {
-		panic("PrepareFunc() requires a function with one or more argument.")
-	}
-
 	argTypes := make([]reflect.Type, numIn)
 	for i := 0; i < numIn; i++ {
 		argTypes[i] = signature.In(i)

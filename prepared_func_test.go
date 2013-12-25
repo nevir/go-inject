@@ -90,10 +90,9 @@ func TestPrepareFuncNoVariadicSupport(t *testing.T) {
 	})
 }
 
-func TestPrepareFuncRequireArgs(t *testing.T) {
-	assert.Panics(t, func() {
-		PrepareFunc(func() {})
-	})
+func TestPrepareFuncNoArgs(t *testing.T) {
+	result := PrepareFunc(func() int { return 123 })(NewTypeRegistry())
+	assert.Equal(t, []interface{}{123}, result)
 }
 
 func TestUnboundValue(t *testing.T) {
