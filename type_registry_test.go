@@ -65,6 +65,12 @@ func TestRegisterRequireInterfacePointer(t *testing.T) {
 	})
 }
 
+func TestRegisterNilValue(t *testing.T) {
+	registry := NewTypeRegistry()
+	assert.Panics(t, func() {
+		registry.Register(nil, (*SomeInterface)(nil))
+	})
+}
 // NewChild
 
 func TestNewChildInheritance(t *testing.T) {

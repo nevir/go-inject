@@ -44,6 +44,9 @@ func NewTypeRegistry() *TypeRegistry {
 //
 // If a value is already registered for the type, it will be overridden.
 func (r *TypeRegistry) Register(value, typePtr interface{}) {
+	if value == nil {
+		panic("Register() doesn't support nil values. Did you reverse the arguments?")
+	}
 	reflectedValue := reflect.ValueOf(value)
 	reflectedType := reflect.TypeOf(typePtr)
 	if reflectedType.Kind() != reflect.Ptr {
