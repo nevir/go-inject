@@ -30,9 +30,9 @@ the values you wish to inject into functions:
 
 ```go
 registry := inject.NewTypeRegistry()
-registry.Register((*http.ResponseWriter)(nil), response)
-registry.Register((*http.Request)(nil), request)
-registry.Register((*Path)(nil), request.URL.Path)
+registry.Register(response, (*http.ResponseWriter)(nil))
+registry.Register(request, (*http.Request)(nil))
+registry.Register(request.URL.Path, (*Path)(nil))
 ```
 
 To perform the injection, simply call the prepared function with a registry:
@@ -52,16 +52,16 @@ For example, you might want to make global values available:
 
 ```go
 globalRegistry := inject.NewTypeRegistry()
-globalRegistry.Register((*Env)(nil), currentEnv)
-globalRegistry.Register((*User)(nil), guestUser)
+globalRegistry.Register(currentEnv, (*Env)(nil))
+globalRegistry.Register(guestUser, (*User)(nil))
 ```
 
 While also providing values that might change more frequently:
 
 ```go
 requestRegistry := globalRegistry.NewChild()
-requestRegistry.Register((*RequestId)(nil), 12345)
-requestRegistry.Register((*User)(nil), currentUser)
+requestRegistry.Register(12345, (*RequestId)(nil))
+requestRegistry.Register(currentUser, (*User)(nil))
 ```
 
 Note that child registries can override values specified by their parents.

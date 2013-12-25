@@ -3,7 +3,7 @@
 // To inject values, you must first register them via a TypeRegistry:
 //
 //   registry := inject.NewTypeRegistry()
-//   registry.Register((*SomeType)(nil), someValue)
+//   registry.Register(someValue, (*SomeType)(nil))
 //
 // Functions that you wish to inject into must also be pre-processed so that
 // they can accept a TypeRegistry (and its values). This is done via
